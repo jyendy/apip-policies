@@ -23,7 +23,7 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPDeployExecutionPolicy
       Description: >-
-        GitHub Actions OIDC deploy role for apip-policies and apip-service (CloudFormation and artifacts).
+        Rol de despliegue (GitHub Actions OIDC): desplegar apip-policies y apip-service (CloudFormation + artefactos).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -124,7 +124,7 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPCloudFormationExecutionPolicy
       Description: >-
-        CloudFormation service role for apip-data, apip-messaging, apip-artifacts, apip-cognito, apip-api.
+        Despliegue de stacks apip-data, apip-messaging, apip-artifacts y apip-api (DynamoDB, EventBridge, S3, IAM rol Lambda, Lambda, API Gateway HTTP v2).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
