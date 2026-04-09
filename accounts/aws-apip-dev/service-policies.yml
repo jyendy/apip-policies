@@ -14,7 +14,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  APIP — Políticas AWSAPIPCloudFormationExecutionPolicy y AWSAPIPLambdaExecutionPolicy
+  APIP - Políticas AWSAPIPCloudFormationExecutionPolicy y AWSAPIPLambdaExecutionPolicy
   (contenido alineado con apip-service CloudFormation stacks; una cuenta por entorno).
 
 Resources:
@@ -73,6 +73,7 @@ Resources:
               - iam:ListPolicyVersions
               - iam:CreatePolicyVersion
               - iam:DeletePolicyVersion
+              - iam:SetDefaultPolicyVersion
               - iam:TagPolicy
               - iam:UntagPolicy
             Resource:

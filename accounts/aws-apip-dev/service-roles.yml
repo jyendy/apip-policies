@@ -16,7 +16,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  APIP — Roles AWSAPIPCloudFormationExecutionRole y AWSAPIPLambdaExecutionRole con sus
+  APIP - Roles AWSAPIPCloudFormationExecutionRole y AWSAPIPLambdaExecutionRole con sus
   políticas administradas correspondientes.
 
 Parameters:
