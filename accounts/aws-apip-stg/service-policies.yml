@@ -124,8 +124,8 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPCloudFormationExecutionPolicy
       Description: >-
-        Despliegue de stacks apip-data, apip-messaging, apip-artifacts y apip-api
-        (DynamoDB, EventBridge, S3, IAM rol Lambda, Lambda, API Gateway HTTP v2).
+        Despliegue de stacks apip-data, apip-messaging, apip-artifacts, apip-cognito y apip-api
+        (DynamoDB, EventBridge, S3, Cognito, IAM rol Lambda, Lambda, API Gateway HTTP v2).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -154,8 +154,26 @@ Resources:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-data/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-messaging/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-artifacts/*'
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-cognito/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-api/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:changeSet/*'
+
+          - Sid: CognitoUserPoolStack
+            Effect: Allow
+            Action:
+              - cognito-idp:CreateUserPool
+              - cognito-idp:DeleteUserPool
+              - cognito-idp:DescribeUserPool
+              - cognito-idp:UpdateUserPool
+              - cognito-idp:SetUserPoolMfaConfig
+              - cognito-idp:CreateUserPoolClient
+              - cognito-idp:DeleteUserPoolClient
+              - cognito-idp:DescribeUserPoolClient
+              - cognito-idp:UpdateUserPoolClient
+              - cognito-idp:TagResource
+              - cognito-idp:UntagResource
+            Resource:
+              - !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
 
           - Sid: DynamoDBForDataStack
             Effect: Allow
