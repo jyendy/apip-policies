@@ -1,0 +1,63 @@
+name: Deploy IAM (apip-policies)
+
+on:
+  push:
+    branches: [develop, staging, main]
+
+concurrency:
+  group: deploy-apip-policies-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy IAM policies + roles
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'prd' || (github.ref_name == 'staging' && 'stg' || 'dev') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target account/env
+        id: target
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            ENV_SHORT="prd"
+            ACCOUNT_FILE="accounts/aws-apip-prd/account-id"
+          elif [[ "${GITHUB_REF_NAME}" == "staging" ]]; then
+            ENV_SHORT="stg"
+            ACCOUNT_FILE="accounts/aws-apip-stg/account-id"
+          else
+            ENV_SHORT="dev"
+            ACCOUNT_FILE="accounts/aws-apip-dev/account-id"
+          fi
+
+          AWS_ACCOUNT_ID="$(cat "${ACCOUNT_FILE}" | tr -d '[:space:]')"
+          echo "env_short=${ENV_SHORT}" >> "$GITHUB_OUTPUT"
+          echo "aws_account_id=${AWS_ACCOUNT_ID}" >> "$GITHUB_OUTPUT"
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ steps.target.outputs.aws_account_id }}:role/AWSAPIPDeployExecutionRole
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Deploy managed policies
+        run: |
+          aws cloudformation deploy \
+            --stack-name apip-iam-policies \
+            --template-file accounts/aws-apip-${{ steps.target.outputs.env_short }}/service-policies.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset
+
+      - name: Deploy roles
+        run: |
+          aws cloudformation deploy \
+            --stack-name apip-iam-roles \
+            --template-file accounts/aws-apip-${{ steps.target.outputs.env_short }}/service-roles.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              GitHubOrg=${{ vars.APIP_GITHUB_ORG || 'your-github-org' }} \
+            --no-fail-on-empty-changeset

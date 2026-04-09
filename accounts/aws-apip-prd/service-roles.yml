@@ -1,0 +1,96 @@
+# Stack IAM: roles que adjuntan las políticas fijas por cuenta (sin Stage en nombres de recursos).
+# Prerrequisito: service-policies.yml desplegado antes en la misma cuenta/región.
+#
+# Despliegue (requiere CAPABILITY_NAMED_IAM):
+#   aws cloudformation deploy \
+#     --stack-name apip-iam-roles \
+#     --template-file accounts/aws-apip-dev/service-roles.yml \
+#     --capabilities CAPABILITY_NAMED_IAM
+#
+# ARNs de rol (misma cuenta, sin depender de outputs del stack):
+#   arn:aws:iam::<AccountId>:role/AWSAPIPCloudFormationExecutionRole  (--role-arn en CFN)
+#   arn:aws:iam::<AccountId>:role/AWSAPIPLambdaExecutionRole
+#
+# AWSAPIPCloudFormationExecutionRole: confiar en cloudformation.amazonaws.com.
+# AWSAPIPLambdaExecutionRole: confiar en lambda.amazonaws.com (alternativo al apip-lambda del api-stack).
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  APIP — Roles AWSAPIPCloudFormationExecutionRole y AWSAPIPLambdaExecutionRole con sus
+  políticas administradas correspondientes.
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Default: your-github-org
+    Description: Organización/usuario de GitHub dueño de los repos (ej. "acme").
+  AllowedBranchRef:
+    Type: String
+    Default: refs/heads/main
+    Description: Rama permitida para asumir el rol (ej. refs/heads/develop).
+
+Resources:
+  AWSAPIPDeployExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AWSAPIPDeployExecutionRole
+      Description: >-
+        Rol asumible por GitHub Actions (OIDC) para desplegar apip-policies y apip-service en esta cuenta.
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  - !Sub 'repo:${GitHubOrg}/apip-policies:ref:${AllowedBranchRef}'
+                  - !Sub 'repo:${GitHubOrg}/apip-service:ref:${AllowedBranchRef}'
+      ManagedPolicyArns:
+        - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/AWSAPIPDeployExecutionPolicy'
+      Tags:
+        - Key: Project
+          Value: apip
+
+  AWSAPIPCloudFormationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AWSAPIPCloudFormationExecutionRole
+      Description: >-
+        Rol de servicio para que CloudFormation cree/actualice stacks APIP (--role-arn).
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/AWSAPIPCloudFormationExecutionPolicy'
+      Tags:
+        - Key: Project
+          Value: apip
+
+  AWSAPIPLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AWSAPIPLambdaExecutionRole
+      Description: >-
+        Rol de ejecución Lambda APIP (DynamoDB + EventBridge + logs + AWSLambdaBasicExecutionRole).
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/AWSAPIPLambdaExecutionPolicy'
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Project
+          Value: apip
