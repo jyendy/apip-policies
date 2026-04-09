@@ -14,8 +14,8 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  APIP - Políticas AWSAPIPCloudFormationExecutionPolicy y AWSAPIPLambdaExecutionPolicy
-  (contenido alineado con apip-service CloudFormation stacks; una cuenta por entorno).
+  APIP managed policies AWSAPIPCloudFormationExecutionPolicy and AWSAPIPLambdaExecutionPolicy
+  (aligned with apip-service CloudFormation stacks; one account per environment).
 
 Resources:
   AWSAPIPDeployExecutionPolicy:
@@ -290,8 +290,8 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPLambdaExecutionPolicy
       Description: >-
-        Ejecución Lambda apip-api: DynamoDB core/audit, PutEvents al bus de dominio
-        y logs (duplicado tolerable si también se adjunta AWSLambdaBasicExecutionRole).
+        Lambda apip-api execution: DynamoDB core/audit, PutEvents to domain bus and logs
+        (duplicate acceptable if AWSLambdaBasicExecutionRole is also attached).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
