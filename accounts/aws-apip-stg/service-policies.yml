@@ -155,6 +155,7 @@ Resources:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-artifacts/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-cognito/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-api/*'
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-audit-ingest/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:changeSet/*'
 
           - Sid: CognitoUserPoolStack
@@ -197,6 +198,24 @@ Resources:
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-core'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-core/index/*'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-audit'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-access-roles'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-user-profiles'
+
+          - Sid: EventBridgeRulesOnDefaultBus
+            Effect: Allow
+            Action:
+              - events:PutRule
+              - events:DeleteRule
+              - events:DescribeRule
+              - events:PutTargets
+              - events:RemoveTargets
+              - events:ListTargetsByRule
+              - events:ListTagsForResource
+              - events:TagResource
+              - events:UntagResource
+            Resource:
+              - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+              - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/apip-audit-ingest'
 
           - Sid: EventBridgeMessagingStack
             Effect: Allow
@@ -254,6 +273,7 @@ Resources:
               - iam:GetPolicyVersion
             Resource:
               - !Sub 'arn:aws:iam::${AWS::AccountId}:role/AWSAPIPLambdaExecutionRole'
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:role/apip-audit-ingest-lambda'
               - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
             Condition:
               StringEqualsIfExists:
@@ -285,7 +305,9 @@ Resources:
               - lambda:UntagResource
               - lambda:ListTags
               - lambda:PublishVersion
-            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:apip-api'
+            Resource:
+              - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:apip-api'
+              - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:apip-audit-ingest'
 
           - Sid: ApiGatewayV2HttpApi
             Effect: Allow
@@ -307,7 +329,9 @@ Resources:
               - logs:TagLogGroup
               - logs:UntagLogGroup
               - logs:ListTagsLogGroup
-            Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/apip-api:*'
+            Resource:
+              - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/apip-api:*'
+              - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/apip-audit-ingest:*'
 
           - Sid: CloudFormationExportsRead
             Effect: Allow
@@ -321,8 +345,8 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPLambdaExecutionPolicy
       Description: >-
-        Lambda apip-api execution: DynamoDB core/audit, PutEvents to domain bus and logs
-        (duplicate acceptable if AWSLambdaBasicExecutionRole is also attached).
+        Lambda apip-api execution: DynamoDB core/audit/access-roles/user-profiles, PutEvents to
+        domain and default event buses, CloudWatch logs (duplicate acceptable if AWSLambdaBasicExecutionRole is also attached).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -339,6 +363,19 @@ Resources:
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-core'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-core/index/*'
 
+          - Sid: DynamoDBAccessRolesAndUserProfiles
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:Query
+              - dynamodb:BatchWriteItem
+            Resource:
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-access-roles'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-user-profiles'
+
           - Sid: DynamoDBAuditTable
             Effect: Allow
             Action:
@@ -350,7 +387,9 @@ Resources:
             Effect: Allow
             Action:
               - events:PutEvents
-            Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/apip-domain'
+            Resource:
+              - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/apip-domain'
+              - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
 
           - Sid: CloudWatchLogsLambda
             Effect: Allow
