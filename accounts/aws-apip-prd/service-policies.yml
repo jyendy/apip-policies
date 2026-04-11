@@ -345,8 +345,8 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPLambdaExecutionPolicy
       Description: >-
-        Lambda apip-api execution: DynamoDB core/audit/access-roles/user-profiles, PutEvents to
-        domain and default event buses, CloudWatch logs (duplicate acceptable if AWSLambdaBasicExecutionRole is also attached).
+        Lambda apip-api execution: DynamoDB core/audit, PutEvents to domain bus and logs
+        (duplicate acceptable if AWSLambdaBasicExecutionRole is also attached).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
