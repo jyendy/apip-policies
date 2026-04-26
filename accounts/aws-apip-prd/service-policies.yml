@@ -23,7 +23,7 @@ Resources:
     Properties:
       ManagedPolicyName: AWSAPIPDeployExecutionPolicy
       Description: >-
-        Rol de despliegue (GitHub Actions OIDC): desplegar apip-policies, apip-service y apip-website (CloudFormation + artefactos).
+        Rol de despliegue (GitHub Actions OIDC): desplegar apip-policies y apip-service (CloudFormation + artefactos).
       PolicyDocument:
         Version: '2012-10-17'
         Statement:

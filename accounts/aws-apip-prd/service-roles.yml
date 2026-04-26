@@ -31,7 +31,7 @@ Resources:
     Properties:
       RoleName: AWSAPIPDeployExecutionRole
       Description: >-
-        Rol asumible por GitHub Actions (OIDC) para desplegar apip-policies, apip-service y apip-website en esta cuenta.
+        Rol asumible por GitHub Actions (OIDC) para desplegar apip-policies y apip-service en esta cuenta.
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
