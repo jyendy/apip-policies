@@ -135,24 +135,11 @@ Resources:
           - Sid: CloudFormationStacks
             Effect: Allow
             Action:
-              - cloudformation:CreateStack
-              - cloudformation:UpdateStack
-              - cloudformation:DeleteStack
-              - cloudformation:DescribeStacks
-              - cloudformation:DescribeStackEvents
-              - cloudformation:DescribeStackResources
-              - cloudformation:GetTemplate
-              - cloudformation:ValidateTemplate
-              - cloudformation:ListStackResources
-              - cloudformation:CreateChangeSet
-              - cloudformation:DescribeChangeSet
-              - cloudformation:ExecuteChangeSet
-              - cloudformation:DeleteChangeSet
-              - cloudformation:GetTemplateSummary
-              - cloudformation:TagResource
-              - cloudformation:UntagResource
-              - cloudformation:ListStackSets
-              - cloudformation:UpdateTerminationProtection
+              - cloudformation:*Stack*
+              - cloudformation:*ChangeSet*
+              - cloudformation:*Template*
+              - cloudformation:*StackSet*
+              - cloudformation:*TerminationProtection*
             Resource:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-data/*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/apip-messaging/*'
@@ -166,15 +153,9 @@ Resources:
           - Sid: CognitoUserPoolStack
             Effect: Allow
             Action:
-              - cognito-idp:CreateUserPool
-              - cognito-idp:DeleteUserPool
-              - cognito-idp:DescribeUserPool
-              - cognito-idp:UpdateUserPool
+              - cognito-idp:*UserPool
               - cognito-idp:SetUserPoolMfaConfig
-              - cognito-idp:CreateUserPoolClient
-              - cognito-idp:DeleteUserPoolClient
-              - cognito-idp:DescribeUserPoolClient
-              - cognito-idp:UpdateUserPoolClient
+              - cognito-idp:*UserPoolClient
               - cognito-idp:CreateGroup
               - cognito-idp:DeleteGroup
               - cognito-idp:GetGroup
@@ -188,17 +169,11 @@ Resources:
           - Sid: DynamoDBForDataStack
             Effect: Allow
             Action:
-              - dynamodb:CreateTable
-              - dynamodb:DeleteTable
-              - dynamodb:DescribeTable
-              - dynamodb:UpdateTable
-              - dynamodb:DescribeContinuousBackups
-              - dynamodb:UpdateContinuousBackups
+              - dynamodb:*Table*
+              - dynamodb:*ContinuousBackups*
+              - dynamodb:*TimeToLive*
               - dynamodb:TagResource
               - dynamodb:UntagResource
-              - dynamodb:ListTagsOfResource
-              - dynamodb:DescribeTimeToLive
-              - dynamodb:UpdateTimeToLive
             Resource:
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-core'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/apip-core/index/*'
@@ -209,9 +184,7 @@ Resources:
           - Sid: EventBridgeRulesOnDefaultBus
             Effect: Allow
             Action:
-              - events:PutRule
-              - events:DeleteRule
-              - events:DescribeRule
+              - events:*Rule
               - events:PutTargets
               - events:RemoveTargets
               - events:ListTargetsByRule
@@ -225,9 +198,7 @@ Resources:
           - Sid: EventBridgeMessagingStack
             Effect: Allow
             Action:
-              - events:CreateEventBus
-              - events:DeleteEventBus
-              - events:DescribeEventBus
+              - events:*EventBus
               - events:ListTagsForResource
               - events:TagResource
               - events:UntagResource
@@ -236,12 +207,8 @@ Resources:
           - Sid: S3ArtifactsStack
             Effect: Allow
             Action:
-              - s3:CreateBucket
-              - s3:DeleteBucket
-              - s3:HeadBucket
-              - s3:GetBucketPolicy
-              - s3:PutBucketPolicy
-              - s3:DeleteBucketPolicy
+              - s3:*Bucket
+              - s3:*BucketPolicy
               - s3:GetBucketLocation
               - s3:GetBucketVersioning
               - s3:PutBucketVersioning
@@ -258,11 +225,8 @@ Resources:
           - Sid: CloudFrontWebsiteStack
             Effect: Allow
             Action:
-              - cloudfront:CreateDistribution
-              - cloudfront:GetDistribution
+              - cloudfront:*Distribution
               - cloudfront:GetDistributionConfig
-              - cloudfront:UpdateDistribution
-              - cloudfront:DeleteDistribution
               - cloudfront:TagResource
               - cloudfront:UntagResource
               - cloudfront:CreateOriginAccessControl
@@ -282,10 +246,7 @@ Resources:
           - Sid: IamLambdaExecutionRole
             Effect: Allow
             Action:
-              - iam:CreateRole
-              - iam:DeleteRole
-              - iam:GetRole
-              - iam:UpdateRole
+              - iam:*Role
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
               - iam:PutRolePolicy
@@ -295,7 +256,6 @@ Resources:
               - iam:ListAttachedRolePolicies
               - iam:TagRole
               - iam:UntagRole
-              - iam:PassRole
               - iam:GetPolicy
               - iam:GetPolicyVersion
             Resource:
@@ -319,9 +279,7 @@ Resources:
           - Sid: LambdaApiStack
             Effect: Allow
             Action:
-              - lambda:CreateFunction
-              - lambda:DeleteFunction
-              - lambda:GetFunction
+              - lambda:*Function
               - lambda:GetFunctionConfiguration
               - lambda:UpdateFunctionCode
               - lambda:UpdateFunctionConfiguration
@@ -349,13 +307,11 @@ Resources:
           - Sid: CloudWatchLogsForLambdaManagement
             Effect: Allow
             Action:
-              - logs:CreateLogGroup
-              - logs:DeleteLogGroup
+              - logs:*LogGroup
               - logs:DescribeLogGroups
               - logs:PutRetentionPolicy
               - logs:TagLogGroup
               - logs:UntagLogGroup
-              - logs:ListTagsLogGroup
             Resource:
               - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/apip-api:*'
               - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/apip-audit-ingest:*'
