@@ -224,6 +224,15 @@ Resources:
               - s3:PutBucketTagging
             Resource: arn:aws:s3:::*
 
+          # s3:*Bucket no incluye PutBucketCORS (el sufijo es CORS). Buckets físicos del stack apip-api (p. ej. documentos).
+          - Sid: S3ApipApiStackBucketCors
+            Effect: Allow
+            Action:
+              - s3:PutBucketCORS
+              - s3:GetBucketCORS
+              - s3:DeleteBucketCORS
+            Resource: !Sub 'arn:aws:s3:::apip-api-*'
+
           - Sid: CloudFrontWebsiteStack
             Effect: Allow
             Action:
