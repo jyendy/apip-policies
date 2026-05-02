@@ -16,20 +16,18 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  APIP — Roles AWSAPIPCloudFormationExecutionRole y AWSAPIPLambdaExecutionRole con sus
+  APIP - Roles AWSAPIPCloudFormationExecutionRole y AWSAPIPLambdaExecutionRole con sus
   políticas administradas correspondientes.
 
 Parameters:
   GitHubOrg:
     Type: String
     Default: your-github-org
-    Description: Organización/usuario de GitHub dueño de los repos (ej. "acme").
-  AllowedBranchRef:
-    Type: String
-    Default: refs/heads/develop
-    Description: Rama permitida para asumir el rol (ej. refs/heads/develop).
+    Description: Organización/usuario de GitHub dueño de los repos (ej. "acme"). Sobrescribir en deploy (APIP_GITHUB_ORG).
 
 Resources:
+  # Trust: jobs en rama develop y/o GitHub Environment "dev". Si el job usa `environment:`, el claim
+  # OIDC `sub` es repo:ORG/REPO:environment:dev (no ref:). Incluimos ref + environment.
   AWSAPIPDeployExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -48,8 +46,12 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringLike:
                 token.actions.githubusercontent.com:sub:
-                  - !Sub 'repo:${GitHubOrg}/apip-policies:ref:${AllowedBranchRef}'
-                  - !Sub 'repo:${GitHubOrg}/apip-service:ref:${AllowedBranchRef}'
+                  - !Sub 'repo:${GitHubOrg}/apip-policies:ref:refs/heads/develop'
+                  - !Sub 'repo:${GitHubOrg}/apip-service:ref:refs/heads/develop'
+                  - !Sub 'repo:${GitHubOrg}/apip-website:ref:refs/heads/develop'
+                  - !Sub 'repo:${GitHubOrg}/apip-policies:environment:dev'
+                  - !Sub 'repo:${GitHubOrg}/apip-service:environment:dev'
+                  - !Sub 'repo:${GitHubOrg}/apip-website:environment:dev'
       ManagedPolicyArns:
         - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/AWSAPIPDeployExecutionPolicy'
       Tags:

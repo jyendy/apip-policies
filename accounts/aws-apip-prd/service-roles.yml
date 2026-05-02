@@ -23,11 +23,7 @@ Parameters:
   GitHubOrg:
     Type: String
     Default: your-github-org
-    Description: Organización/usuario de GitHub dueño de los repos (ej. "acme").
-  AllowedBranchRef:
-    Type: String
-    Default: refs/heads/main
-    Description: Rama permitida para asumir el rol (ej. refs/heads/develop).
+    Description: Organización/usuario de GitHub dueño de los repos (ej. "acme"). Sobrescribir en deploy (APIP_GITHUB_ORG).
 
 Resources:
   AWSAPIPDeployExecutionRole:
@@ -48,8 +44,12 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringLike:
                 token.actions.githubusercontent.com:sub:
-                  - !Sub 'repo:${GitHubOrg}/apip-policies:ref:${AllowedBranchRef}'
-                  - !Sub 'repo:${GitHubOrg}/apip-service:ref:${AllowedBranchRef}'
+                  - !Sub 'repo:${GitHubOrg}/apip-policies:ref:refs/heads/main'
+                  - !Sub 'repo:${GitHubOrg}/apip-service:ref:refs/heads/main'
+                  - !Sub 'repo:${GitHubOrg}/apip-website:ref:refs/heads/main'
+                  - !Sub 'repo:${GitHubOrg}/apip-policies:environment:prd'
+                  - !Sub 'repo:${GitHubOrg}/apip-service:environment:prd'
+                  - !Sub 'repo:${GitHubOrg}/apip-website:environment:prd'
       ManagedPolicyArns:
         - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/AWSAPIPDeployExecutionPolicy'
       Tags:
