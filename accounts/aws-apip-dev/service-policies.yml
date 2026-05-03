@@ -314,6 +314,8 @@ Resources:
               - apigateway:PUT
               - apigateway:PATCH
               - apigateway:DELETE
+              - apigateway:TagResource
+              - apigateway:UntagResource
             Resource: !Sub 'arn:aws:apigateway:${AWS::Region}::/*'
 
           - Sid: CloudWatchLogsForLambdaManagement
