@@ -85,6 +85,7 @@ Resources:
               - iam:DeleteRole
               - iam:GetRole
               - iam:UpdateRole
+              - iam:UpdateRoleDescription
               - iam:UpdateAssumeRolePolicy
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
