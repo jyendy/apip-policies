@@ -246,6 +246,13 @@ Resources:
               - cloudfront:UpdateOriginAccessControl
               - cloudfront:DeleteOriginAccessControl
               - cloudfront:ListTagsForResource
+              - cloudfront:CreateFunction
+              - cloudfront:UpdateFunction
+              - cloudfront:DeleteFunction
+              - cloudfront:DescribeFunction
+              - cloudfront:ListFunctions
+              - cloudfront:PublishFunction
+              - cloudfront:TestFunction
             Resource: '*'
 
           - Sid: S3LambdaCodeRead
