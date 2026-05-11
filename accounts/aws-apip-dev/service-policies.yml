@@ -250,6 +250,7 @@ Resources:
               - cloudfront:UpdateFunction
               - cloudfront:DeleteFunction
               - cloudfront:DescribeFunction
+              - cloudfront:GetFunction
               - cloudfront:ListFunctions
               - cloudfront:PublishFunction
               - cloudfront:TestFunction
